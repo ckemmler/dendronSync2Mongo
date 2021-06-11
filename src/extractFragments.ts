@@ -45,7 +45,6 @@ function extractFragments(markdown: string, noteId: string, date: Date): Fragmen
     }
   }
 
-  console.log(fragments)
   return fragments
 }
 

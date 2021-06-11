@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "md2mongo": "node scripts/md2mongo"
+    "md2mongo": "node 'node_modules/.bin/jest' 'src/sync2mongo.test.ts' -t 'Sync to mongodb'"
   },
   "dependencies": {
     "core-js": "^3.9.1",

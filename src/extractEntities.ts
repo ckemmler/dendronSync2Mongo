@@ -18,7 +18,6 @@ function extractEntities(markdown: string, noteId: string, date: Date): Entity[]
     entities.push(entity);
   }
 
-  console.log(entities)
   return entities
 }
 

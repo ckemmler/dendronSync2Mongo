@@ -2,8 +2,7 @@ import fs from 'fs'
 import path from 'path'
 import { extractEntities, findEntitiesTags } from './extractEntities'
 
-const directoryPath = path.join(__dirname, '../../../../candide/Dendron/vault')
-
+const directoryPath = path.join(__dirname, '../dendron/vault')
 
 describe('Entities extraction', () => {
   it('detects tags', () => {

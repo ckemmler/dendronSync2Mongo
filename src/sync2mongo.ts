@@ -1,13 +1,14 @@
+import { strict as assert } from 'assert';
 import fs from "fs";
-import path from "path";
 import * as matter from "gray-matter";
+import path from "path";
 import * as Realm from "realm-web";
-import Fragment from "./domain/Fragment";
-import Entity from "./domain/Entity";
-import extractDate from "./extractDate";
-import { extractFragments } from "./extractFragments";
-import { extractEntities } from "./extractEntities";
 import { load } from "ts-dotenv";
+import Entity from "./domain/Entity";
+import Fragment from "./domain/Fragment";
+import extractDate from "./extractDate";
+import { extractEntities } from "./extractEntities";
+import { extractFragments } from "./extractFragments";
 
 const env = load({
   REALM_APP_ID: String,
@@ -49,15 +50,15 @@ export async function deleteAllCollections(): Promise<string> {
   let atlasNotesColl = mongodb.db(env.MONGO_DB_NAME).collection("notes");
   const deleteNotesResult = await atlasNotesColl.deleteMany({});
 
-  const atlasFragmentsColl = mongodb
-    .db(env.MONGO_DB_NAME)
-    .collection("fragments");
-  const deleteFragmentsResult = await atlasFragmentsColl.deleteMany({});
+  // const atlasFragmentsColl = mongodb
+  //   .db(env.MONGO_DB_NAME)
+  //   .collection("fragments");
+  // const deleteFragmentsResult = await atlasFragmentsColl.deleteMany({});
 
-  const atlasEntitiesColl = mongodb
-    .db(env.MONGO_DB_NAME)
-    .collection("entities");
-  const deleteEntitiesResult = await atlasEntitiesColl.deleteMany({});
+  // const atlasEntitiesColl = mongodb
+  //   .db(env.MONGO_DB_NAME)
+  //   .collection("entities");
+  // const deleteEntitiesResult = await atlasEntitiesColl.deleteMany({});
 
   return "SUCCESS";
 }
@@ -109,11 +110,6 @@ export async function sync2mongo(): Promise<string> {
   if (mongoNoteIds.length > 0) {
     const deleteQuery = { "data.id": { $in: mongoNoteIds } };
     const deleteResult = await atlasNotesColl.deleteMany(deleteQuery);
-
-    console.log(
-      "purged locally updated/deleted documents: " +
-        JSON.stringify(deleteResult)
-    );
   } else {
     console.info("there were no documents to purge");
   }
@@ -133,44 +129,31 @@ export async function sync2mongo(): Promise<string> {
   if (mdNoteIds.length > 0) {
     // uniquement pour les notes de type journal, identifier les fragments et les entités et les stocker sur mongo
 
-    const fragments: Fragment[] = [];
-    const entities: Entity[] = [];
+    // const fragments: Fragment[] = [];
 
-    mdNoteIds
-      .map((id) => mdNotesMap[id])
-      .forEach((mdNote) => {
-        // extraire la date
-        const date = extractDate(mdNote.data.filename);
-        if (date) {
-          // extraire les fragments
-          const noteFragments = extractFragments(
-            mdNote.content,
-            mdNote.data.id,
-            date.toDate()
-          );
-          fragments.push(...noteFragments);
-
-          // extraire les entités
-          const noteEntities = extractEntities(
-            mdNote.content,
-            mdNote.data.id,
-            date.toDate()
-          );
-          entities.push(...noteEntities);
-        }
-      });
+    // mdNoteIds
+    //   .map((id) => mdNotesMap[id])
+    //   .forEach((mdNote) => {
+    //     // extraire la date
+    //     const date = extractDate(mdNote.data.filename);
+    //     if (date) {
+    //       // extraire les fragments
+    //       const noteFragments = extractFragments(
+    //         mdNote.content,
+    //         mdNote.data.id,
+    //         date.toDate()
+    //       );
+    //       fragments.push(...noteFragments);
+    //     }
+    //   });
 
     await atlasNotesColl.insertMany(mdNoteIds.map((id) => mdNotesMap[id]));
 
-    const atlasFragmentsColl = mongodb
-      .db(env.MONGO_DB_NAME)
-      .collection("fragments");
-    await atlasFragmentsColl.insertMany(fragments);
+    // const atlasFragmentsColl = mongodb
+    //   .db(env.MONGO_DB_NAME)
+    //   .collection("fragments");
+    // await atlasFragmentsColl.insertMany(fragments);
 
-    const atlasEntitiesColl = mongodb
-      .db(env.MONGO_DB_NAME)
-      .collection("entities");
-    await atlasEntitiesColl.insertMany(entities);
   } else {
     console.log("there were no new documents");
   }

@@ -8,4 +8,3 @@ describe('Dates extraction', () => {
       expect(date?.date()).toBe(20)
     })
   })
-  

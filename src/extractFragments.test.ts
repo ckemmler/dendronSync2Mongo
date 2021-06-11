@@ -1,9 +1,10 @@
 import fs from 'fs'
 import path from 'path'
+import { load } from 'ts-dotenv';
 import { extractFragments, findTags } from './extractFragments'
 
-const directoryPath = path.join(__dirname, '../../../candide/Dendron/vault')
-
+const env = load({DENDRON_VAULT_PATH: String});
+const directoryPath = path.join(__dirname, env.DENDRON_VAULT_PATH);
 
 describe('Fragments extraction', () => {
   it('detects tags', () => {
@@ -21,7 +22,7 @@ describe('Fragments extraction', () => {
   })
   it('detects fragment with multiple tags', () => {
     for (const expl of [
-      `Bonjour, [[#tags.tag]]  
+      `Bonjour, [[#tags.tag]]
       [[#tags.otherTag]] tag here`,
       `Bonjour, [[#tags.tag]][[#tags.otherTag]] tag here`,
       `Bonjour, [[#tags.tag]]  [[#tags.otherTag]] tag here`,
