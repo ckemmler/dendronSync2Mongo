@@ -1,4 +1,4 @@
-import { strict as assert } from 'assert';
+import { strict as assert } from "assert";
 import fs from "fs";
 import * as matter from "gray-matter";
 import path from "path";
@@ -80,7 +80,7 @@ export async function sync2mongo(): Promise<string> {
     if (!isDirectory) {
       const md = matter.read(filePath);
       if (md.data.id && md.data.id !== "root") {
-        md.data.filename = file;
+        md.data.path = file.replace(".md", "").replace(/\./g, "/");
         mdNotes.push(md);
         mdNotesMap[md.data.id] = md;
       }
@@ -147,13 +147,23 @@ export async function sync2mongo(): Promise<string> {
     //     }
     //   });
 
-    await atlasNotesColl.insertMany(mdNoteIds.map((id) => mdNotesMap[id]));
+    await atlasNotesColl.insertMany(
+      mdNoteIds.map((id) => {
+        return {
+          content: mdNotesMap[id].content,
+          path: mdNotesMap[id].data.path,
+          id: id,
+          title: mdNotesMap[id].data.title,
+          updated: mdNotesMap[id].data.updated,
+          created: mdNotesMap[id].data.created,
+        };
+      })
+    );
 
     // const atlasFragmentsColl = mongodb
     //   .db(env.MONGO_DB_NAME)
     //   .collection("fragments");
     // await atlasFragmentsColl.insertMany(fragments);
-
   } else {
     console.log("there were no new documents");
   }
